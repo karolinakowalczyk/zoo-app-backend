@@ -19,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 const db = require("./app/models");
 const Role = db.role;
 
+//connect with db
 db.mongoose
   .connect(dbConfig.mongoURI, {
     useNewUrlParser: true,
@@ -35,7 +36,7 @@ db.mongoose
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "Hello! It's Zoo App server" });
 });
 
 // routes
