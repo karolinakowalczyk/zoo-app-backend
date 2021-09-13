@@ -1,8 +1,13 @@
-const config = require("../config/auth.config");
+const config = require("../config/auth.config"); //JWTSecret
+//const clienturl = require("../config/clienturl.config"); //clientURL
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-
+const AccessHash = db.activationHashes;
+//const { sendResetPasswordEmail } = require('../middlewares/mailer');
+const sendEmail = require("../middlewares/sendEmail");
+//bcryptsalt = 8
+const clienturl = "localhost://8081";
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -106,4 +111,66 @@ exports.signin = (req, res) => {
         accessToken: token
       });
     });
+};
+
+
+exports.resertPasswordRequest = async (req, res) => {
+  const user = await User.findOne({email: req.body.email})
+  if (!user) {
+      return res.status(404).send({ message: "User Not found." });
+  }
+  //return res.status(200).send({ message: "OK" });
+  let resetToken = jwt.sign({ id: user.id }, config.secret, {
+    expiresIn: 86400 // 24 hours
+  });
+  const hash = await bcrypt.hash(resetToken, Number(8));
+  const link = `${clienturl}/passwordReset?token=${resetToken}&id=${user._id}`;
+  sendEmail(
+    user.email,
+    "Password Reset Request",
+    {
+      name: user.name,
+      link: link,
+    },
+    "./template/requestResetPassword.handlebars"
+  );
+  return res.json({ message: user.email + link + 'Please check your email to reset the password!' });
+    
+  //return link;
+
+  /*try {
+  const user = User.findOne({
+    email: req.body.email
+  })
+  .exec((err, user) => {
+      if (err) {
+        res.status(500).send({ message: err });
+        return;
+      }
+
+      if (!user) {
+        return res.status(404).send({ message: "User Not found." });
+    }
+
+    var token = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: 86400 // 24 hours
+    });
+    //return res.json({ message: user.email + 'Please check your email to reset the password!' });
+    
+    const link = `http://localhost:8081/api/auth/passwordReset?token=${resetToken}&id=${user._id}`;
+    sendEmail(user.email,"Password Reset Request",{name: user.name,link: link,},"./template/requestResetPassword.handlebars");
+    return link;
+    });
+    //return res.json({ message: user + 'Please check your email to reset the password!' });
+  } catch {
+      return res.status(422).send("An error occured trying to reset password!")
+  }*/
+};
+
+exports.resertPassword = (req, res) => {
+  try {
+   
+  } catch {
+
+  }
 };
