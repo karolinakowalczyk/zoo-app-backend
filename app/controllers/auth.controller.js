@@ -3,11 +3,12 @@ const config = require("../config/auth.config"); //JWTSecret
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+const Token = db.token;
 const AccessHash = db.activationHashes;
-//const { sendResetPasswordEmail } = require('../middlewares/mailer');
-const sendEmail = require("../middlewares/sendEmail");
+const { sendEmail } = require('../middlewares/mailer');
+//const sendEmail = require("../middlewares/sendEmail");
 //bcryptsalt = 8
-const clienturl = "localhost://8081";
+const clienturl = "http://localhost:8081";
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -114,7 +115,7 @@ exports.signin = (req, res) => {
 };
 
 
-exports.resertPasswordRequest = async (req, res) => {
+/*const requestPasswordReset = async (req, res) => {
   const user = await User.findOne({email: req.body.email})
   if (!user) {
       return res.status(404).send({ message: "User Not found." });
@@ -124,6 +125,12 @@ exports.resertPasswordRequest = async (req, res) => {
     expiresIn: 86400 // 24 hours
   });
   const hash = await bcrypt.hash(resetToken, Number(8));
+  await new Token({
+    userId: user._id,
+    token: hash,
+    createdAt: Date.now(),
+  }).save();
+
   const link = `${clienturl}/passwordReset?token=${resetToken}&id=${user._id}`;
   sendEmail(
     user.email,
@@ -134,37 +141,50 @@ exports.resertPasswordRequest = async (req, res) => {
     },
     "./template/requestResetPassword.handlebars"
   );
-  return res.json({ message: user.email + link + 'Please check your email to reset the password!' });
-    
-  //return link;
+  return link;
+  //return res.json({ message: user.email + link + 'Please check your email to reset the password!' });
+};*/
 
-  /*try {
-  const user = User.findOne({
-    email: req.body.email
-  })
-  .exec((err, user) => {
-      if (err) {
-        res.status(500).send({ message: err });
-        return;
-      }
+const requestPasswordReset = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("Email does not exist");
 
-      if (!user) {
-        return res.status(404).send({ message: "User Not found." });
-    }
+  let token = await Token.findOne({ userId: user._id });
+  if (token) await token.deleteOne();
 
-    var token = jwt.sign({ id: user.id }, config.secret, {
-      expiresIn: 86400 // 24 hours
-    });
-    //return res.json({ message: user.email + 'Please check your email to reset the password!' });
-    
-    const link = `http://localhost:8081/api/auth/passwordReset?token=${resetToken}&id=${user._id}`;
-    sendEmail(user.email,"Password Reset Request",{name: user.name,link: link,},"./template/requestResetPassword.handlebars");
-    return link;
-    });
-    //return res.json({ message: user + 'Please check your email to reset the password!' });
-  } catch {
-      return res.status(422).send("An error occured trying to reset password!")
-  }*/
+  //let resetToken = crypto.randomBytes(32).toString("hex");
+  let resetToken = jwt.sign({ id: user.id }, config.secret, {
+    expiresIn: 86400 // 24 hours
+  });
+  const hash = await bcrypt.hash(resetToken, Number(8));
+
+  await new Token({
+    userId: user._id,
+    token: hash,
+    createdAt: Date.now(),
+  }).save();
+
+  const link = `${clienturl}/passwordReset?token=${resetToken}&id=${user._id}`;
+   await sendEmail({toUser: user, resetlink: link});
+
+  /*sendEmail(
+    user.email,
+    "Password Reset Request",
+    {
+      name: user.name,
+      link: link,
+    },
+    "./template/requestResetPassword.handlebars"
+  );*/
+  return link;
+};
+
+
+exports.resetPasswordRequestController = async (req, res, next) => {
+  const requestPasswordResetService = await requestPasswordReset(
+    req.body.email
+  );
+  return res.json(requestPasswordResetService);
 };
 
 exports.resertPassword = (req, res) => {
