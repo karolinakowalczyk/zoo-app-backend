@@ -1,3 +1,3 @@
 module.exports = {
-  clienturl: "localhost://8081"
+  clienturl: "http://localhost:8081"
 };
