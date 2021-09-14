@@ -9,7 +9,6 @@ db.user = require("./user.model");
 db.role = require("./role.model");
 db.attractions = require("./attractions.model");
 db.activationHashes = require("./activationHashes.model");
-db.token = require("./token.model");
 
 db.ROLES = ["user", "admin"];
 
