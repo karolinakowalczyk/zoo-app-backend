@@ -1,12 +1,10 @@
 const config = require("../config/auth.config"); //JWTSecret
-//const clienturl = require("../config/clienturl.config"); //clientURL
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
 const Token = db.token;
 const AccessHash = db.activationHashes;
 const { sendEmail } = require('../middlewares/mailer');
-//const sendEmail = require("../middlewares/sendEmail");
 //bcryptsalt = 8
 const clienturl = "http://localhost:8081";
 var jwt = require("jsonwebtoken");
@@ -114,40 +112,12 @@ exports.signin = (req, res) => {
     });
 };
 
-
-/*const requestPasswordReset = async (req, res) => {
-  const user = await User.findOne({email: req.body.email})
-  if (!user) {
-      return res.status(404).send({ message: "User Not found." });
-  }
-  //return res.status(200).send({ message: "OK" });
-  let resetToken = jwt.sign({ id: user.id }, config.secret, {
-    expiresIn: 86400 // 24 hours
-  });
-  const hash = await bcrypt.hash(resetToken, Number(8));
-  await new Token({
-    userId: user._id,
-    token: hash,
-    createdAt: Date.now(),
-  }).save();
-
-  const link = `${clienturl}/passwordReset?token=${resetToken}&id=${user._id}`;
-  sendEmail(
-    user.email,
-    "Password Reset Request",
-    {
-      name: user.name,
-      link: link,
-    },
-    "./template/requestResetPassword.handlebars"
-  );
-  return link;
-  //return res.json({ message: user.email + link + 'Please check your email to reset the password!' });
-};*/
-
-const requestPasswordReset = async (email) => {
+exports.resetPasswordRequestController = async (req, res, next) => {
+  const email = req.body.email;
   const user = await User.findOne({ email });
-  if (!user) throw new Error("Email does not exist");
+  if (!user) {
+    return res.status(404).send({ message: "Account with this email not found" });
+  } 
 
   let token = await Token.findOne({ userId: user._id });
   if (token) await token.deleteOne();
@@ -165,26 +135,8 @@ const requestPasswordReset = async (email) => {
   }).save();
 
   const link = `${clienturl}/passwordReset?token=${resetToken}&id=${user._id}`;
-   await sendEmail({toUser: user, resetlink: link});
-
-  /*sendEmail(
-    user.email,
-    "Password Reset Request",
-    {
-      name: user.name,
-      link: link,
-    },
-    "./template/requestResetPassword.handlebars"
-  );*/
-  return link;
-};
-
-
-exports.resetPasswordRequestController = async (req, res, next) => {
-  const requestPasswordResetService = await requestPasswordReset(
-    req.body.email
-  );
-  return res.json(requestPasswordResetService);
+  await sendEmail({toUser: user, resetlink: link});
+  res.send({ message: "Email was sent!" });
 };
 
 exports.resertPassword = (req, res) => {
