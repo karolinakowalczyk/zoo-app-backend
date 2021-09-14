@@ -1,8 +1,12 @@
-const config = require("../config/auth.config");
+const config = require("../config/auth.config"); //JWTSecret
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-
+const Token = db.token;
+const AccessHash = db.activationHashes;
+const { sendEmail } = require('../middlewares/mailer');
+const mainurl = require("../config/clienturl.config");
+const clienturl = mainurl.clienturl;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -106,4 +110,37 @@ exports.signin = (req, res) => {
         accessToken: token
       });
     });
+};
+
+exports.resetPasswordRequestController = async (req, res, next) => {
+  const email = req.body.email;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).send({ message: "Account with this email not found" });
+  } 
+  const hash = new AccessHash({userId: user._id});
+  await hash.save();
+  const link = `${clienturl}/reset-password/${hash._id}`;
+  await sendEmail({toUser: user, resetlink: link});
+  return res.json({message: 'Please check your email to reset the password!'})
+};
+
+exports.resetPasswordController = async (req, res ) => {
+  const password = req.body.password;
+  const hash = req.body.hash;
+  if (hash.length !== 24) {
+    return res.status(404).send({ message: "Cannot reset a password!" });
+  }
+
+  const aHash = await AccessHash.findOne({ _id: hash });
+  if (!aHash) {
+    return res.status(404).send({ message: "Cannot reset a password!" });
+  }
+  
+  await User.updateOne(
+    { _id: aHash.userId },
+    { password: bcrypt.hashSync(password, 8) } 
+  );
+    await aHash.remove();
+    return res.json({message: 'Password has been reseted!'});
 };
