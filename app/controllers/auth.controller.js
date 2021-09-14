@@ -80,7 +80,8 @@ exports.signin = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: "User Not found." });
       }
-
+      console.log("podane" + req.body.password);
+      console.log("w bazie" + user.password);
       var passwordIsValid = bcrypt.compareSync(
         req.body.password,
         user.password
@@ -135,6 +136,15 @@ exports.resetPasswordController = async (req, res ) => {
   const aHash = await AccessHash.findOne({ _id: hash });
   if (!aHash) {
     return res.status(404).send({ message: "Cannot reset a password!" });
+  }
+
+  const user = await User.findOne({ _id: aHash.userId });
+  var samePasswords = bcrypt.compareSync(
+    password,
+    user.password
+  );
+  if (samePasswords) {
+    return res.status(404).send({ message: "New password must be different from the old one!"});
   }
   
   await User.updateOne(
