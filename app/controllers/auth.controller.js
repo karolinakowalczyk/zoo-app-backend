@@ -105,6 +105,12 @@ exports.signin = (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
+        name: user.name,
+        surname: user.surname,
+        address: user.address,
+        postalCode: user.postalCode,
+        city: user.city,
+        phonenumber: user.phonenumber,
         roles: authorities,
         accessToken: token
       });
@@ -152,3 +158,30 @@ exports.resetPasswordController = async (req, res ) => {
     await aHash.remove();
     return res.json({message: 'Password has been reseted!'});
 };
+
+exports.editProfile = async (req, res) => {
+  const email = req.body.email;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).send({ message: "Account not found" });
+  }
+  
+await User.findOneAndUpdate(
+    { email: email },
+    {
+      $set: {
+        name: req.body.name,
+        surname: req.body.surname,
+        address: req.body.address,
+        postalCode: req.body.postalCode,
+        city: req.body.city,
+        phonenumber: req.body.phonenumber
+      }
+    },
+    {
+      upsert: true
+    }
+  )
+  .then(() => { return res.json({ message: 'Your profile has been updated!' }); })
+    .catch(error => {return res.status(404).send({ message: error });});
+}
