@@ -165,7 +165,8 @@ exports.editProfile = async (req, res) => {
   if (!user) {
     return res.status(404).send({ message: "Account not found" });
   }
-  await User.findOneAndUpdate(
+  
+await User.findOneAndUpdate(
     { email: email },
     {
       $set: {
@@ -181,6 +182,6 @@ exports.editProfile = async (req, res) => {
       upsert: true
     }
   )
-    .then(() => { return res.json({ message: 'Your profile has been updated!' }); })
+  .then(() => { return res.json({ message: 'Your profile has been updated!' }); })
     .catch(error => {return res.status(404).send({ message: error });});
 }
