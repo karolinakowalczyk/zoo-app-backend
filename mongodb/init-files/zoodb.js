@@ -10,9 +10,12 @@ db.createUser({
     ],
 });
 
-/*db.createCollection("users");
+db.createCollection("users");
+db.createCollection("roles");
+db.createCollection("activationhashes");
+db.createCollection("attractions");
 
-db.users.insertMany(
+/*db.users.insertMany(
     [
         {
             _id: new ObjectId("61001441bd7856fd1bcda534"),
