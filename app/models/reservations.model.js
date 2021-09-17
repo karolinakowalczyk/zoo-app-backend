@@ -7,8 +7,14 @@ const reservationsSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
-    date: String,
-    expirationDate: String,
+    //date: String,
+    //expirationDate: String,
+    date: {
+      type : Date
+    },
+    expirationDate: {
+      type : Date
+    }
   },
   { timestamps: true }
 );
