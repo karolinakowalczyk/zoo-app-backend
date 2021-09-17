@@ -19,25 +19,15 @@ exports.createReservation = async (req, res) => {
   const quantity = req.body.quantity;
   const today = new Date();
 
-  /*const freePlaces = await FreePlaces.findOne({ reservationDate: date });
+  let freePlaces = await FreePlaces.findOne({ reservationDate: date });
   if (!freePlaces) {
-    const freePlaces = new FreePlaces({ quantity: 2, reservationDate: date });
-    await freePlaces.save();
+    const newFreePlaces = new FreePlaces({ quantity: 2, reservationDate: date });
+    await newFreePlaces.save();
+    freePlaces = newFreePlaces;
   }
-  if ( freePlaces && (freePlaces.quantity < quantity)) {
+  if (freePlaces && (freePlaces.quantity < quantity)) {
     return res.status(404).send({ message: "Sorry, no more places for this day!" });
-  }*/
-  
-
-  /*if (freePlaces.quantity < quantity) {
-    return res.status(404).send({ message: "Sorry, no more places for this day!" });
-  }*/
-  /*const newQuantity = freePlaces.quantity - quantity;
-  console.log("newQuantity" + newQuantity);
-  await FreePlaces.updateOne(
-    { _id: freePlaces.id },
-    { quantity:  newQuantity } 
-  );*/
+  }
 
   const existingReservation = await Reservation.find({ userId: userId });
  
@@ -49,7 +39,6 @@ exports.createReservation = async (req, res) => {
     for (let i = 0; i < exp_dates.length; i++) {
       //today comes before exp_date
       if (today < exp_dates[i]) {
-        
         return res.status(404).send({ message: "You can't' make a reservation!" });
       }
     }
@@ -57,6 +46,12 @@ exports.createReservation = async (req, res) => {
 
   const reservation = new Reservation({ userId: userId, date: date, expirationDate: expirationDate });
   await reservation.save();
+  const newQuantity = freePlaces.quantity - quantity;
+
+  await FreePlaces.updateOne(
+    { _id: freePlaces.id },
+    { quantity:  newQuantity } 
+  );
   /*const freePlaces = new FreePlaces({ quantity: 2, reservationDate: date });
   await freePlaces.save();*/
   return res.json({ message: 'Reservation added!' });

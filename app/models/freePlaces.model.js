@@ -9,9 +9,10 @@ const freePlacesSchema = mongoose.Schema({
             type: Number,
             default: 0
         },
-        reservationDate: {
+        reservationDate: String,
+        /*reservationDate: {
             type : Date
-        },
+        },*/
     }  
 );
 
