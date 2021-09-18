@@ -2,14 +2,18 @@ const db = require("../models");
 const Reservation = db.reservations;
 const FreePlaces = db.freePlaces;
 exports.getUserReservations = (req, res) => {
-  const userId = req.body.userId;
-  try {
-    Reservation.find({userId: userId}, function (err, reservations) {
-      res.json(reservations);
+  const userId = req.query.userId;
+  Reservation.find({userId: userId})
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
+      });
     });
-  } catch (err) {
-    res.status(500).json({ err: "An error occured trying to fetch user reservations" });
-  }
+
 }
 
 exports.createReservation = async (req, res) => {
