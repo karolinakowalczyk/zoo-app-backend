@@ -3,8 +3,12 @@ const mongoose = require("mongoose");
 const attractionsSchema = mongoose.Schema(
     {
         name: String,
+
+        duration: Number,
+
+        hour: Number,
     
-        hours: { type: Array, "default": [] }
+        //hours: { type: Array, "default": [] }
     },
 );
 
