@@ -11,6 +11,7 @@ db.attractions = require("./attractions.model");
 db.activationHashes = require("./activationHashes.model");
 db.reservations = require("./reservations.model");
 db.freePlaces = require("./freePlaces.model");
+db.plans = require("./plans.model");
 
 db.ROLES = ["user", "admin"];
 
