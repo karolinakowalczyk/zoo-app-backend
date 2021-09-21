@@ -1,6 +1,21 @@
 const db = require("../models");
 const Plan = db.plans;
 
+exports.getUserPlans = (req, res) => {
+  const userId = req.query.userId;
+  Plan.find({owner: userId})
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred trying to get your trip plans."
+      });
+    });
+
+}
+
 exports.createPlan = async (req, res) => {
   const owner = req.body.owner;
   const reservation = req.body.reservation;
