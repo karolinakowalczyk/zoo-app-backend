@@ -2,7 +2,7 @@ const config = require("../config/auth.config"); //JWTSecret
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-const Token = db.token;
+const RefreshToken = db.refreshToken;
 const AccessHash = db.activationHashes;
 const { sendEmail } = require('../middlewares/mailer');
 const mainurl = require("../config/clienturl.config");
@@ -71,7 +71,7 @@ exports.signin = (req, res) => {
     username: req.body.username
   })
     .populate("roles", "-__v")
-    .exec((err, user) => {
+    .exec(async (err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
@@ -80,7 +80,7 @@ exports.signin = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: "User Not found." });
       }
-      var passwordIsValid = bcrypt.compareSync(
+      let passwordIsValid = bcrypt.compareSync(
         req.body.password,
         user.password
       );
@@ -92,11 +92,14 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.id }, config.secret, {
-        expiresIn: 86400 // 24 hours
+      let token = jwt.sign({ id: user.id }, config.secret, {
+        //expiresIn: 86400 // 24 hours
+        expiresIn: config.jwtExpiration,
       });
 
-      var authorities = [];
+      let refreshToken = await RefreshToken.createToken(user);
+
+      let authorities = [];
 
       for (let i = 0; i < user.roles.length; i++) {
         authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
@@ -112,10 +115,50 @@ exports.signin = (req, res) => {
         city: user.city,
         phonenumber: user.phonenumber,
         roles: authorities,
-        accessToken: token
+        accessToken: token,
+        refreshToken: refreshToken,
       });
     });
 };
+
+
+exports.refreshToken = async (req, res) => {
+  const { refreshToken: requestToken } = req.body;
+
+  if (requestToken == null) {
+    return res.status(403).json({ message: "Refresh Token is required!" });
+  }
+
+  try {
+    let refreshToken = await RefreshToken.findOne({ token: requestToken });
+
+    if (!refreshToken) {
+      res.status(403).json({ message: "Refresh token is not in database!" });
+      return;
+    }
+
+    if (RefreshToken.verifyExpiration(refreshToken)) {
+      RefreshToken.findByIdAndRemove(refreshToken._id, { useFindAndModify: false }).exec();
+      
+      res.status(403).json({
+        message: "Refresh token was expired. Please make a new login request",
+      });
+      return;
+    }
+
+    let newAccessToken = jwt.sign({ id: refreshToken.user._id }, config.secret, {
+      expiresIn: config.jwtExpiration,
+    });
+
+    return res.status(200).json({
+      accessToken: newAccessToken,
+      refreshToken: refreshToken.token,
+    });
+  } catch (err) {
+    return res.status(500).send({ message: err });
+  }
+};
+
 
 exports.resetPasswordRequestController = async (req, res, next) => {
   const email = req.body.email;
