@@ -1,9 +1,8 @@
 const controller = require("../controllers/petfinder.controller");
-const fetch = require('node-fetch')
 
-module.exports = function(app) {
-  //app.get("/api/petfinder/getAccessToken", controller.fetchAccessToken);
-        app.get('/api/petfinder/getAccessToken', async (req, res) => {
+module.exports = function (app) {
+    app.get("/api/petfinder/getAccessToken", controller.getAccessToken);
+        /*app.get('/api/petfinder/getAccessToken', async (req, res) => {
         const params = new URLSearchParams();
         params.append("grant_type", "client_credentials");
         params.append("client_id", "HS5962v4NTN1Mo4StTNQ4sxlVPsCXnIZRz0KQLR9Ihi0xJTota");
@@ -21,5 +20,5 @@ module.exports = function(app) {
         } catch (err) {
             res.status(500).send('Something went wrong')
         }
-        })
+        })*/
 };

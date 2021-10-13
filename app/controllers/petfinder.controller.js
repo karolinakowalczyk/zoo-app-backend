@@ -1,38 +1,21 @@
-
-let request = require('request');
-exports.fetchAccessToken = async (req, res) => {
-    //const request = require('request-promise');
-    console.log("hey");
-    
-const params = new URLSearchParams();
-params.append("grant_type", "client_credentials");
-params.append("client_id", "HS5962v4NTN1Mo4StTNQ4sxlVPsCXnIZRz0KQLR9Ihi0xJTota");
-params.append("client_secret", "6TwCtSlk1lwO5w4HbFprjxMy6qWpWZeUgf7esv4D");
-const options = {
-    method: 'POST',
-    uri: 'https://api.petfinder.com/v2/oauth2/token',
-    body: params,
-    json: true,
-
+const fetch = require('node-fetch');
+const config = require('../config/auth.config');
+exports.getAccessToken = async (req, res) => {
+    const params = new URLSearchParams();
+    params.append("grant_type", "client_credentials");
+    params.append("client_id", config.petfinderkey);
+    params.append("client_secret", config.petfindersecret);
+    try {
+        const apiResponse = await fetch(
+        'https://api.petfinder.com/v2/oauth2/token',
+            {
+            method: "POST",
+            body: params,
+            }
+        )
+        const apiResponseJson = await apiResponse.json()
+        res.json(apiResponseJson.access_token).status(200);
+    } catch (err) {
+        res.status(500).send('Error occured when get access token to petfinder api');
+    }
 }
-    request(options, function (response) {
-        console.log(response);
-    res.status(200).json(response);
-})
-      /*const params = new URLSearchParams();
-      console.log(process.env.REACT_APP_PET_FINDER_API_SECRET);
-      params.append("grant_type", "client_credentials");
-      params.append("client_id", "HS5962v4NTN1Mo4StTNQ4sxlVPsCXnIZRz0KQLR9Ihi0xJTota");
-      //params.append("client_id", petfinderkeys.PET_FINDER_API_KEY);
-      
-      params.append("client_secret", "6TwCtSlk1lwO5w4HbFprjxMy6qWpWZeUgf7esv4D");
-      const petfinderRes = await fetch(
-        "https://api.petfinder.com/v2/oauth2/token",
-        {
-          method: "POST",
-          body: params,
-        }
-      );
-      const data = await petfinderRes.json();
-      setAccessToken(data.access_token);*/
-    };
