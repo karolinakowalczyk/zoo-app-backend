@@ -12,11 +12,11 @@ const corsStaticOptions = {
 console.log(allowedUrls);
 const app = express();
 
-var corsOptions = {
+/*var corsOptions = {
   origin: "http://localhost:8081"
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions));*/
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -48,11 +48,14 @@ app.get("/", (req, res) => {
 });
 
 // routes
-require("./app/routes/auth.routes", cors(corsStaticOptions))(app);
+app.use(cors(corsStaticOptions));
+
+require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
 require("./app/routes/attractions.routes")(app);
 require("./app/routes/reservations.routes")(app);
 require("./app/routes/plans.routes")(app);
+require("./app/routes/petfinder.routes")(app);
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
