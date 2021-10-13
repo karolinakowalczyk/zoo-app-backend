@@ -1,7 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const dbConfig = require("./app/config/db.config");
+const auth = require("./app/config/auth.config");
+const allowedUrls = auth.allowedURLs;
 
+const corsStaticOptions = {
+  credentials: true,
+  origin: allowedUrls,
+};
+
+console.log(allowedUrls);
 const app = express();
 
 var corsOptions = {
@@ -40,7 +48,7 @@ app.get("/", (req, res) => {
 });
 
 // routes
-require("./app/routes/auth.routes")(app);
+require("./app/routes/auth.routes", cors(corsStaticOptions))(app);
 require("./app/routes/user.routes")(app);
 require("./app/routes/attractions.routes")(app);
 require("./app/routes/reservations.routes")(app);
