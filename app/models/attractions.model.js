@@ -7,8 +7,6 @@ const attractionsSchema = mongoose.Schema(
         duration: Number,
 
         hour: Number,
-    
-        //hours: { type: Array, "default": [] }
     },
 );
 
