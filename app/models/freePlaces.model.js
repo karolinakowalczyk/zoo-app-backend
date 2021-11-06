@@ -10,9 +10,6 @@ const freePlacesSchema = mongoose.Schema({
             default: 0
         },
         reservationDate: String,
-        /*reservationDate: {
-            type : Date
-        },*/
     }  
 );
 

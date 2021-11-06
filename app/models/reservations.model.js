@@ -3,18 +3,13 @@ const mongoose = require("mongoose");
 const reservationsSchema = mongoose.Schema(
   {
     userId: 
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        },
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
+    name: String,
     date: String,
     expirationDate: String,
-    /*date: {
-      type : Date
-    },
-    expirationDate: {
-      type : Date
-    }*/
   },
   { timestamps: true }
 );

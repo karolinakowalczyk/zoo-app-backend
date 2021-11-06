@@ -1,14 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const dbConfig = require("./app/config/db.config");
+const auth = require("./app/config/auth.config");
+const allowedUrls = auth.allowedURLs;
 
-const app = express();
-
-var corsOptions = {
-  origin: "http://localhost:8081"
+const corsStaticOptions = {
+  credentials: true,
+  origin: allowedUrls,
 };
 
-app.use(cors(corsOptions));
+const app = express();
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -40,11 +41,13 @@ app.get("/", (req, res) => {
 });
 
 // routes
+app.use(cors(corsStaticOptions));
+
 require("./app/routes/auth.routes")(app);
-require("./app/routes/user.routes")(app);
 require("./app/routes/attractions.routes")(app);
 require("./app/routes/reservations.routes")(app);
 require("./app/routes/plans.routes")(app);
+require("./app/routes/petfinder.routes")(app);
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

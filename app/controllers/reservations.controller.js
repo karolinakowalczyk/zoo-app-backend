@@ -18,6 +18,7 @@ exports.getUserReservations = (req, res) => {
 
 exports.createReservation = async (req, res) => {
   const userId = req.body.userId;
+  const name = req.body.name;
   const date = req.body.date;
   const expirationDate = req.body.expirationDate;
   const quantity = req.body.quantity;
@@ -48,7 +49,7 @@ exports.createReservation = async (req, res) => {
     }
   }
 
-  const reservation = new Reservation({ userId: userId, date: date, expirationDate: expirationDate });
+  const reservation = new Reservation({ userId: userId, name: name, date: date, expirationDate: expirationDate });
   await reservation.save();
   const newQuantity = freePlaces.quantity - quantity;
 
