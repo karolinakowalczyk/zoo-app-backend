@@ -44,7 +44,6 @@ app.get("/", (req, res) => {
 app.use(cors(corsStaticOptions));
 
 require("./app/routes/auth.routes")(app);
-require("./app/routes/user.routes")(app);
 require("./app/routes/attractions.routes")(app);
 require("./app/routes/reservations.routes")(app);
 require("./app/routes/plans.routes")(app);
