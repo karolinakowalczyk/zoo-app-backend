@@ -1,3 +1,5 @@
+const { db } = require("../../app/models/reservations.model");
+
 db = db.getSiblingDB("zoo");
 db.createUser({
     user: "zoodb",
@@ -10,30 +12,11 @@ db.createUser({
     ],
 });
 
-db.createCollection("users");
-db.createCollection("roles");
 db.createCollection("activationhashes");
 db.createCollection("attractions");
-
-/*db.users.insertMany(
-    [
-        {
-            _id: new ObjectId("61001441bd7856fd1bcda534"),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            login: "ania123@wp.pl",
-            password: "qwerty",
-            name: "Anna",
-            surname: "Nowak",
-         },
-        {
-            _id: new ObjectId("61001507bd7856fd1bcda537"),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            login: "jan123@gmail.com",
-            password: "jan123",
-            name: "Jan",
-            surname: "Kowalski",
-        }
-    ]
-);*/
+db.createCollection("freeplaces");
+db.createCollection("plans");
+db.createCollection("refreshtokens");
+db.createCollection("reservations");
+db.createCollection("roles");
+db.createCollection("users");
