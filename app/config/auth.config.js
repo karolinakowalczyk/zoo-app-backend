@@ -7,5 +7,7 @@ module.exports = {
     "https://api.petfinder.com"
   ],
   petfinderkey: "HS5962v4NTN1Mo4StTNQ4sxlVPsCXnIZRz0KQLR9Ihi0xJTota",
-  petfindersecret: "6TwCtSlk1lwO5w4HbFprjxMy6qWpWZeUgf7esv4D"
+  petfindersecret: "6TwCtSlk1lwO5w4HbFprjxMy6qWpWZeUgf7esv4D",
+  maileruser: "zooapplication2021@gmail.com",
+  mailerpassword: "Z@@app1999"
 };

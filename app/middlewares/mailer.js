@@ -1,13 +1,13 @@
 const nodemailer = require('nodemailer');
-
+const config = require('../config/auth.config');
 
 function send(message) {
   return new Promise((res, rej) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'zooapplication2021@gmail.com',
-        pass: 'Z@@app1999'
+        user: config.maileruser,
+        pass: config.mailerpassword
       }
     })
 
@@ -23,9 +23,8 @@ function send(message) {
 
 exports.sendEmail = ({toUser, resetlink}) => {
   const message = {
-    from: 'zooapplication0@gmail.com',
+    from: 'zooapplication2021@gmail.com',
     to: toUser.email,
-    //to: 'zooapplication0@gmail.com',
     subject: 'Zoo App - Reset Password',
     html:
       `
