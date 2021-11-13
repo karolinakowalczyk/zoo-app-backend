@@ -5,8 +5,7 @@ const Role = db.role;
 const RefreshToken = db.refreshToken;
 const AccessHash = db.activationHashes;
 const { sendEmail } = require('../middlewares/mailer');
-const mainurl = require("../config/clienturl.config");
-const clienturl = mainurl.clienturl;
+const clienturl = config.allowedURLs[0];
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
