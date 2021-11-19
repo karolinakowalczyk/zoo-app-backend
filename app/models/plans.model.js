@@ -5,7 +5,8 @@ const plansSchema = mongoose.Schema(
         owner: 
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            index: true
         },
         reservation: { type: Object, "default": [] },
         transport: { type: Object, "default": [] },

@@ -5,7 +5,8 @@ const reservationsSchema = mongoose.Schema(
     userId: 
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
+      index: true
     },
     name: String,
     date: String,
