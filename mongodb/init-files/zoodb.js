@@ -1,5 +1,3 @@
-const { db } = require("../../app/models/reservations.model");
-
 db = db.getSiblingDB("zoo");
 db.createUser({
     user: "zoodb",
