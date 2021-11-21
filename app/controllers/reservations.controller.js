@@ -26,7 +26,7 @@ exports.createReservation = async (req, res) => {
 
   let freePlaces = await FreePlaces.findOne({ reservationDate: date });
   if (!freePlaces) {
-    const newFreePlaces = new FreePlaces({ quantity: 2, reservationDate: date });
+    const newFreePlaces = new FreePlaces({ quantity: 100, reservationDate: date });
     await newFreePlaces.save();
     freePlaces = newFreePlaces;
   }
