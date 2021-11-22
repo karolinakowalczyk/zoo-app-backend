@@ -57,8 +57,6 @@ exports.createReservation = async (req, res) => {
     { _id: freePlaces.id },
     { quantity:  newQuantity } 
   );
-  /*const freePlaces = new FreePlaces({ quantity: 2, reservationDate: date });
-  await freePlaces.save();*/
   return res.json({ message: 'Reservation added!' });
   
 }
