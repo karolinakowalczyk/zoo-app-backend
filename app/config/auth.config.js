@@ -2,7 +2,7 @@ module.exports = {
   secret: "zoo-app-key",
   jwtExpiration: 900,           // 15 minutes
   jwtRefreshExpiration: 86400,   // 24 hours
-  activationHashExpiration: 180, //10 minutes
+  activationHashExpiration: 600, //10 minutes
   allowedURLs: [
     "http://localhost:8081",
     "https://api.petfinder.com"
