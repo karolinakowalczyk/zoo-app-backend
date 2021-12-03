@@ -164,8 +164,14 @@ exports.resetPasswordRequestController = async (req, res, next) => {
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(404).send({ message: "Account with this email not found" });
-  } 
-  const hash = new AccessHash({userId: user._id});
+  }
+
+  let expiredAt = new Date();
+
+  expiredAt.setSeconds(
+    expiredAt.getSeconds() + config.activationHashExpiration
+  );
+  const hash = new AccessHash({userId: user._id, expiryDate: expiredAt });
   await hash.save();
   const link = `${clienturl}/reset-password/${hash._id}`;
   await sendEmail({toUser: user, resetlink: link});
@@ -180,6 +186,10 @@ exports.resetPasswordController = async (req, res ) => {
   }
 
   const aHash = await AccessHash.findOne({ _id: hash });
+  if (aHash.expiryDate.getTime() < new Date().getTime()) {
+    await aHash.remove();
+    return res.status(404).send({ message: "Hash is expired!" });
+  }
   if (!aHash) {
     return res.status(404).send({ message: "Cannot reset a password!" });
   }

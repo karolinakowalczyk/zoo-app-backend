@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const config = require("../config/auth.config");
 
 const activationHashesSchema = mongoose.Schema(
     {
@@ -7,6 +8,7 @@ const activationHashesSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
+        expiryDate: Date,
     },
 );
 
