@@ -1,6 +1,6 @@
 module.exports = {
   secret: "zoo-app-key",
-  jwtExpiration: 3600,           // 1 hour
+  jwtExpiration: 900,           // 15 minutes
   jwtRefreshExpiration: 86400,   // 24 hours
   allowedURLs: [
     "http://localhost:8081",
