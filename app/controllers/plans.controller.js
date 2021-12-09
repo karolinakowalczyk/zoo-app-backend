@@ -28,6 +28,6 @@ exports.createPlan = async (req, res) => {
   const plan = new Plan({ owner: owner, reservation: reservation, transport: transport, attractions: attractions});
   await plan.save();
   
-  return res.json({ message: 'Plan added!' });
+  return res.status(200).json({ message: 'Plan added!' });
   
 }

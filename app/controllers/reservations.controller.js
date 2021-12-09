@@ -31,7 +31,7 @@ exports.createReservation = async (req, res) => {
     freePlaces = newFreePlaces;
   }
   if (freePlaces && (freePlaces.quantity < quantity)) {
-    return res.status(404).send({ message: "Sorry, no more places for this day!" });
+    return res.status(400).send({ message: "Sorry, no more places for this day!" });
   }
 
   const existingReservation = await Reservation.find({ userId: userId });
@@ -44,7 +44,7 @@ exports.createReservation = async (req, res) => {
     for (let i = 0; i < exp_dates.length; i++) {
       //today comes before exp_date
       if (today < exp_dates[i]) {
-        return res.status(404).send({ message: "You can't' make a reservation!" });
+        return res.status(400).send({ message: "You can't' make a reservation!" });
       }
     }
   }
@@ -57,6 +57,6 @@ exports.createReservation = async (req, res) => {
     { _id: freePlaces.id },
     { quantity:  newQuantity } 
   );
-  return res.json({ message: 'Reservation added!' });
+  return res.status(200).json({ message: 'Reservation added!' });
   
 }
