@@ -92,7 +92,6 @@ exports.signin = (req, res) => {
       }
 
       let token = jwt.sign({ id: user.id }, config.secret, {
-        //expiresIn: 86400 // 24 hours
         expiresIn: config.jwtExpiration,
       });
 
@@ -122,7 +121,8 @@ exports.signin = (req, res) => {
 
 
 exports.refreshToken = async (req, res) => {
-  const { refreshToken: requestToken } = req.body;
+  
+  const requestToken = req.body.refreshToken;
 
   if (requestToken == null) {
     return res.status(403).json({ message: "Refresh Token is required!" });
@@ -140,7 +140,7 @@ exports.refreshToken = async (req, res) => {
       RefreshToken.findByIdAndRemove(refreshToken._id, { useFindAndModify: false }).exec();
       
       res.status(403).json({
-        message: "Refresh token was expired. Please make a new login request",
+        message: "Refresh token was expired. Please make a new signin request",
       });
       return;
     }
@@ -149,10 +149,11 @@ exports.refreshToken = async (req, res) => {
       expiresIn: config.jwtExpiration,
     });
 
-    return res.status(200).json({
+    return res.status(200).send({
       accessToken: newAccessToken,
-      refreshToken: refreshToken.token,
+      refreshToken: refreshToken.token
     });
+    
   } catch (err) {
     return res.status(500).send({ message: err });
   }
@@ -175,7 +176,7 @@ exports.resetPasswordRequestController = async (req, res, next) => {
   await hash.save();
   const link = `${clienturl}/reset-password/${hash._id}`;
   await sendEmail({toUser: user, resetlink: link});
-  return res.json({message: 'Please check your email to reset the password!'})
+  return res.status(200).json({message: 'Please check your email to reset the password!'})
 };
 
 exports.resetPasswordController = async (req, res ) => {
@@ -195,7 +196,7 @@ exports.resetPasswordController = async (req, res ) => {
   }
 
   const user = await User.findOne({ _id: aHash.userId });
-  var samePasswords = bcrypt.compareSync(
+  let samePasswords = bcrypt.compareSync(
     password,
     user.password
   );
@@ -235,5 +236,5 @@ await User.findOneAndUpdate(
     }
   )
   .then(() => { return res.json({ message: 'Your profile has been updated!' }); })
-    .catch(error => {return res.status(404).send({ message: error });});
+  .catch(error => {return res.status(404).send({ message: error });});
 }
