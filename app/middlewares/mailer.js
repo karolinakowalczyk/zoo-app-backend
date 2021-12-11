@@ -23,7 +23,7 @@ function send(message) {
 
 exports.sendEmail = ({toUser, resetlink}) => {
   const message = {
-    from: 'zooapplication2021@gmail.com',
+    from: config.maileruser,
     to: toUser.email,
     subject: 'Zoo App - Reset Password',
     html:
